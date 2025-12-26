@@ -47,7 +47,7 @@ class GenericControllerTest(metaclass=abc.ABCMeta):
 
         # then
         response_data = response.json
-        self.assertEqual(201, response.status_code, response.text)
+        self.assertEqual(201, response.status_code, address + " - " + response.text)
         self.compare_entities(entity, response_data)
         self.assertIsNotNone(response_data["id"])
 

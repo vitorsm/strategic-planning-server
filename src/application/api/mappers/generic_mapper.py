@@ -25,7 +25,7 @@ TO_DTO_CONVERTERS = {
 
 
 def register_new_mapper(mapper: Type['GenericMapper']):
-    TO_ENTITY_CONVERTERS[mapper._get_entity_type()] = lambda dto: mapper.to_entity(dto)
+    TO_ENTITY_CONVERTERS[mapper._get_entity_type()] = lambda dto: mapper.to_entity(dto, validate_entity=False)
     TO_DTO_CONVERTERS[mapper._get_entity_type()] = lambda entity: mapper.to_dto(entity)
 
 
@@ -36,11 +36,11 @@ class GenericMapper(Generic[Entity]):
         return {}
 
     @classmethod
-    def to_entity(cls, dto: dict) -> Optional[Entity]:
+    def to_entity(cls, dto: dict, validate_entity: bool = True) -> Optional[Entity]:
         entity_type = cls._get_entity_type()
         result = cls.__to_entity(dto, entity_type)
 
-        if result:
+        if result and validate_entity:
             result.__post_init__()
 
         return result

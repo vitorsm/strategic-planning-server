@@ -50,3 +50,28 @@ CREATE TABLE task_type (
     FOREIGN KEY (workspace_id) REFERENCES workspace(id),
     FOREIGN KEY (parent_type_id) REFERENCES task_type(id)
 );
+
+CREATE TABLE team (
+    id UUID NOT NULL,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL DEFAULT NULL,
+    created_by UUID NOT NULL,
+    updated_by UUID NOT NULL,
+    workspace_id UUID NOT NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (created_by) REFERENCES "user"(id),
+    FOREIGN KEY (updated_by) REFERENCES "user"(id),
+    FOREIGN KEY (workspace_id) REFERENCES workspace(id)
+);
+
+CREATE TABLE team_has_user (
+    team_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+
+    PRIMARY KEY (team_id, user_id),
+    FOREIGN KEY (team_id) REFERENCES team(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE
+);
