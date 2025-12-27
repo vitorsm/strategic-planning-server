@@ -38,7 +38,6 @@ class TeamDB(GenericEntityDB, Base[Team]):
     def update_attributes(self, team: Team):
         super().update_attributes(team)
         self.users = [TeamUserDB(team.id, user_id) for user_id in team.members_ids] if team.members_ids else []
-        print(self.users)
 
     def to_entity(self) -> Team:
         team = object.__new__(Team)
