@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
+from uuid import UUID
 
 from src.entities.generic_entity import GenericEntity
 from src.entities.team import Team
@@ -28,7 +29,7 @@ class Goal(GenericEntity):
     due_date: datetime
     user: Optional[User]
     team: Optional[Team]
-    parent_goal: Optional['Goal']
+    parent_goal_id: Optional[UUID]
 
     def _get_invalid_fields(self) -> List[str]:
         invalid_fields = []

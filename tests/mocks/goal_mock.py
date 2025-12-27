@@ -1,6 +1,7 @@
 import random
 from datetime import datetime, timedelta
 from typing import Optional
+from uuid import UUID
 
 from src.entities.goal import Goal, GoalStatus, GoalType
 from src.entities.team import Team
@@ -12,7 +13,7 @@ now = datetime.now()
 def get_valid_goal(status: GoalStatus = GoalStatus.IN_PROGRESS, description: str = None,
                    gtype: GoalType = GoalType.ORGANIZATIONAL, due_date: datetime = now,
                    user=user_mock.get_valid_user(), team: Optional[Team] = team_mock.get_valid_team(),
-                   parent_goal: Goal = None, **kwargs) -> Goal:
+                   parent_goal_id: UUID = None, **kwargs) -> Goal:
     goal = object.__new__(Goal)
     if not kwargs.get("name"):
         kwargs["name"] = generic_entity_mock.random_str("Goal")
@@ -23,7 +24,7 @@ def get_valid_goal(status: GoalStatus = GoalStatus.IN_PROGRESS, description: str
     goal.due_date = due_date
     goal.user = user
     goal.team = team
-    goal.parent_goal = parent_goal
+    goal.parent_goal_id = parent_goal_id
     goal.type = gtype
     return goal
 
@@ -36,6 +37,6 @@ def get_default_goal() -> Goal:
     goal.due_date = DEFAULT_CREATED_AT + timedelta(days=10)
     goal.user = user_mock.get_default_user()
     goal.team = team_mock.get_default_team()
-    goal.parent_goal = None
+    goal.parent_goal_id = None
     goal.type = GoalType.ORGANIZATIONAL
     return goal
