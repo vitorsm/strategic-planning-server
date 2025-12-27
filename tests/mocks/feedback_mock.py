@@ -1,5 +1,3 @@
-import random
-
 from src.entities.feedback import Feedback, FeedbackType
 from src.entities.user import User
 from tests.mocks import user_mock, generic_entity_mock
@@ -9,10 +7,12 @@ def get_valid_feedback(description: str = None, ftype: FeedbackType = FeedbackTy
                        user_from: User = user_mock.get_valid_user(), user_to: User = user_mock.get_valid_user(),
                        delivered: bool = True, **kwargs) -> Feedback:
     feedback = object.__new__(Feedback)
+
     if not kwargs.get("name"):
         kwargs["name"] = generic_entity_mock.random_str("Feedback")
 
-    generic_entity_mock.fill_valid_entity(feedback)
+    generic_entity_mock.fill_valid_entity(feedback, **kwargs)
+
     feedback.delivered = delivered
     feedback.user_from = user_from
     feedback.user_to = user_to

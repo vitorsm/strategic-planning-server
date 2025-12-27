@@ -75,3 +75,27 @@ CREATE TABLE team_has_user (
     FOREIGN KEY (team_id) REFERENCES team(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE
 );
+
+CREATE TABLE feedback (
+    id UUID NOT NULL,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL DEFAULT NULL,
+    created_by UUID NOT NULL,
+    updated_by UUID NOT NULL,
+    workspace_id UUID NOT NULL,
+
+    description TEXT NULL,
+    feedback_type VARCHAR(100) NOT NULL,
+    user_from UUID NOT NULL,
+    user_to UUID NOT NULL,
+    delivered BOOLEAN NOT NULL DEFAULT FALSE,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (created_by) REFERENCES "user"(id),
+    FOREIGN KEY (updated_by) REFERENCES "user"(id),
+    FOREIGN KEY (workspace_id) REFERENCES workspace(id),
+    FOREIGN KEY (user_from) REFERENCES "user"(id),
+    FOREIGN KEY (user_to) REFERENCES "user"(id)
+);
