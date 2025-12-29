@@ -6,8 +6,12 @@ from injector import Injector
 from src.application.api.controllers.authentication_controller import AuthenticationController
 from src.application.api.controllers.feedback_controller import FeedbackController
 from src.application.api.controllers.goal_controller import GoalController
+from src.application.api.controllers.meeting_controller import MeetingController
+from src.application.api.controllers.reminder_controller import ReminderController
+from src.application.api.controllers.strategic_plan_controller import StrategicPlanController
 from src.application.api.controllers.task_type_controller import TaskTypeController
 from src.application.api.controllers.team_controller import TeamController
+from src.application.api.controllers.work_record_controller import WorkRecordController
 from src.application.api.controllers.workspace_controller import WorkspaceController
 from src.application.api.errors import exception_handler
 from src.application.api.controllers.user_controller import UserController
@@ -37,6 +41,18 @@ def instantiate_controllers(app: Flask, app_injector: Injector):
 
     goal_controller = GoalController(app_injector)
     controllers.append(goal_controller.controller)
+
+    meeting_controller = MeetingController(app_injector)
+    controllers.append(meeting_controller.controller)
+
+    reminder_controller = ReminderController(app_injector)
+    controllers.append(reminder_controller.controller)
+
+    strategic_plan_controller = StrategicPlanController(app_injector)
+    controllers.append(strategic_plan_controller.controller)
+
+    work_record_controller = WorkRecordController(app_injector)
+    controllers.append(work_record_controller.controller)
 
     exception_handler.error_handlers(controllers)
     for controller in controllers:

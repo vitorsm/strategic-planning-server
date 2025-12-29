@@ -35,19 +35,21 @@ class WorkRecordService(GenericEntityService[WorkRecord]):
         invalid_fields = []
 
         try:
-            work_record.users = [self.__user_service.find_by_id(user.id) for user in work_record.users]
+            work_record.users = [self.__user_service.find_by_id(user.id) for user in (work_record.users or [])]
         except EntityNotFoundException:
             invalid_fields.append("users")
 
-        try:
-            work_record.goal = self.__goal_service.find_by_id(work_record.goal.id)
-        except EntityNotFoundException:
-            invalid_fields.append("goal")
+        if work_record.goal:
+            try:
+                work_record.goal = self.__goal_service.find_by_id(work_record.goal.id)
+            except EntityNotFoundException:
+                invalid_fields.append("goal")
 
-        try:
-            work_record.team = self.__team_service.find_by_id(work_record.team.id)
-        except EntityNotFoundException:
-            invalid_fields.append("team")
+        if work_record.team:
+            try:
+                work_record.team = self.__team_service.find_by_id(work_record.team.id)
+            except EntityNotFoundException:
+                invalid_fields.append("team")
 
         try:
             work_record.task_type = self.__task_type_service.find_by_id(work_record.task_type.id)
