@@ -221,3 +221,36 @@ CREATE TABLE strategic_plan_has_goal (
     FOREIGN KEY (strategic_plan_id) REFERENCES strategic_plan(id) ON DELETE CASCADE,
     FOREIGN KEY (goal_id) REFERENCES goal(id) ON DELETE CASCADE
 );
+
+CREATE TABLE work_record (
+    id UUID NOT NULL,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL DEFAULT NULL,
+    created_by UUID NOT NULL,
+    updated_by UUID NOT NULL,
+    workspace_id UUID NOT NULL,
+
+    description TEXT NULL,
+    task_type_id UUID NOT NULL,
+    goal_id UUID NULL,
+    team_id UUID NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (created_by) REFERENCES "user"(id),
+    FOREIGN KEY (updated_by) REFERENCES "user"(id),
+    FOREIGN KEY (workspace_id) REFERENCES workspace(id),
+    FOREIGN KEY (task_type_id) REFERENCES task_type(id),
+    FOREIGN KEY (goal_id) REFERENCES goal(id),
+    FOREIGN KEY (team_id) REFERENCES team(id)
+);
+
+CREATE TABLE work_record_has_user (
+    work_record_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+
+    PRIMARY KEY (work_record_id, user_id),
+    FOREIGN KEY (work_record_id) REFERENCES work_record(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE
+);

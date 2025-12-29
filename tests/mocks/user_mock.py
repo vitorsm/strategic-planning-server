@@ -1,13 +1,16 @@
 import random
 from datetime import datetime
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 from src.entities.user import User
 from tests.mocks import FIRST_DEFAULT_ID
 
 
-def get_valid_user() -> User:
-    return User(id=uuid4(), name="User1", login=f"user{int(random.random() * 1000)}", password="pass",
+def get_valid_user(uid: UUID = None) -> User:
+    if not uid:
+        uid = uuid4()
+
+    return User(id=uid, name="User1", login=f"user{int(random.random() * 1000)}", password="pass",
                 updated_at=datetime.now())
 
 

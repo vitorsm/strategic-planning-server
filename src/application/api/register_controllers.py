@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager
 from injector import Injector
 
 from src.application.api.controllers.authentication_controller import AuthenticationController
+from src.application.api.controllers.feedback_controller import FeedbackController
 from src.application.api.controllers.task_type_controller import TaskTypeController
 from src.application.api.controllers.team_controller import TeamController
 from src.application.api.controllers.workspace_controller import WorkspaceController
@@ -29,6 +30,9 @@ def instantiate_controllers(app: Flask, app_injector: Injector):
 
     team_controller = TeamController(app_injector)
     controllers.append(team_controller.controller)
+
+    feedback_controller = FeedbackController(app_injector)
+    controllers.append(feedback_controller.controller)
 
     exception_handler.error_handlers(controllers)
     for controller in controllers:
