@@ -5,6 +5,7 @@ from injector import Injector
 
 from src.application.api.controllers.authentication_controller import AuthenticationController
 from src.application.api.controllers.feedback_controller import FeedbackController
+from src.application.api.controllers.goal_controller import GoalController
 from src.application.api.controllers.task_type_controller import TaskTypeController
 from src.application.api.controllers.team_controller import TeamController
 from src.application.api.controllers.workspace_controller import WorkspaceController
@@ -33,6 +34,9 @@ def instantiate_controllers(app: Flask, app_injector: Injector):
 
     feedback_controller = FeedbackController(app_injector)
     controllers.append(feedback_controller.controller)
+
+    goal_controller = GoalController(app_injector)
+    controllers.append(goal_controller.controller)
 
     exception_handler.error_handlers(controllers)
     for controller in controllers:
