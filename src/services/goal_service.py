@@ -39,9 +39,9 @@ class GoalService(GenericEntityService[Goal]):
             except EntityNotFoundException:
                 invalid_fields.append("team")
 
-        if goal.parent_goal:
+        if goal.parent_goal_id:
             try:
-                goal.parent_goal = self.find_by_id(goal.parent_goal.id)
+                goal.parent_goal = self.find_by_id(goal.parent_goal_id)
             except EntityNotFoundException:
                 invalid_fields.append("parent_goal")
 

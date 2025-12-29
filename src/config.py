@@ -5,7 +5,7 @@ API_TOKEN_SECRET = os.getenv("API_TOKEN_SECRET", "aidjfaoijfididid")
 
 DB_USERNAME = os.getenv("DB_USERNAME", "admin")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
-DB_NAME = os.getenv("DB_NAME", "app_db_name")
+DB_NAME = os.getenv("DB_NAME", "strategic_planning")
 DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
 DB_PORT = int(os.getenv("DB_PORT", "5432"))
 DB_CONNECTION_STR = f"postgresql+psycopg2://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"

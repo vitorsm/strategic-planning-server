@@ -127,3 +127,39 @@ CREATE TABLE goal (
     FOREIGN KEY (team_id) REFERENCES team(id),
     FOREIGN KEY (parent_goal_id) REFERENCES goal(id)
 );
+
+CREATE TABLE meeting (
+    id UUID NOT NULL,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL DEFAULT NULL,
+    created_by UUID NOT NULL,
+    updated_by UUID NOT NULL,
+    workspace_id UUID NOT NULL,
+
+    meeting_date TIMESTAMP NOT NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (created_by) REFERENCES "user"(id),
+    FOREIGN KEY (updated_by) REFERENCES "user"(id),
+    FOREIGN KEY (workspace_id) REFERENCES workspace(id)
+);
+
+CREATE TABLE meeting_has_user (
+    meeting_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+
+    PRIMARY KEY (meeting_id, user_id),
+    FOREIGN KEY (meeting_id) REFERENCES meeting(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE
+);
+
+CREATE TABLE meeting_note (
+    id UUID NOT NULL,
+    meeting_id UUID NOT NULL,
+    note TEXT NOT NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (meeting_id) REFERENCES meeting(id) ON DELETE CASCADE
+);
