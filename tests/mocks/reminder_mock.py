@@ -7,8 +7,13 @@ def get_valid_reminder(to_user: User = user_mock.get_valid_user(), description: 
     if description is None:
         description = generic_entity_mock.random_str("Description")
 
+    if not kwargs.get("name"):
+        kwargs["name"] = generic_entity_mock.random_str("Reminder")
+        
     reminder = object.__new__(Reminder)
+
     generic_entity_mock.fill_valid_entity(reminder, **kwargs)
+
     reminder.to_user = to_user
     reminder.description = description
     return reminder

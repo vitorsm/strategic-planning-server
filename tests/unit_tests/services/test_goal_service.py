@@ -51,7 +51,7 @@ class TestGoalService(GenericEntityServiceTest, TestCase):
     def test_create_goal_invalid_parameters(self):
         # given
         entity = self.get_default_entity()
-        entity.parent_goal = goal_mock.get_valid_goal()
+        entity.parent_goal_id = FIRST_DEFAULT_ID
 
         self.user_service.find_by_id.side_effect = EntityNotFoundException("User", str(FIRST_DEFAULT_ID))
         self.team_service.find_by_id.side_effect = EntityNotFoundException("Team", str(FIRST_DEFAULT_ID))
@@ -65,4 +65,4 @@ class TestGoalService(GenericEntityServiceTest, TestCase):
         self.get_repository().create.assert_not_called()
         self.assertIn("user", str(ex.exception))
         self.assertIn("team", str(ex.exception))
-        self.assertIn("parent_goal", str(ex.exception))
+        self.assertIn("parent_goal_id", str(ex.exception))
