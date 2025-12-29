@@ -183,3 +183,41 @@ CREATE TABLE reminder (
     FOREIGN KEY (workspace_id) REFERENCES workspace(id),
     FOREIGN KEY (to_user_id) REFERENCES "user"(id)
 );
+
+CREATE TABLE strategic_plan (
+    id UUID NOT NULL,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL DEFAULT NULL,
+    created_by UUID NOT NULL,
+    updated_by UUID NOT NULL,
+    workspace_id UUID NOT NULL,
+
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (created_by) REFERENCES "user"(id),
+    FOREIGN KEY (updated_by) REFERENCES "user"(id),
+    FOREIGN KEY (workspace_id) REFERENCES workspace(id)
+);
+
+CREATE TABLE strategic_plan_has_task_type (
+    strategic_plan_id UUID NOT NULL,
+    task_type_id UUID NOT NULL,
+    percentage FLOAT NOT NULL,
+
+    PRIMARY KEY (strategic_plan_id, task_type_id),
+    FOREIGN KEY (strategic_plan_id) REFERENCES strategic_plan(id) ON DELETE CASCADE,
+    FOREIGN KEY (task_type_id) REFERENCES task_type(id) ON DELETE CASCADE
+);
+
+CREATE TABLE strategic_plan_has_goal (
+    strategic_plan_id UUID NOT NULL,
+    goal_id UUID NOT NULL,
+
+    PRIMARY KEY (strategic_plan_id, goal_id),
+    FOREIGN KEY (strategic_plan_id) REFERENCES strategic_plan(id) ON DELETE CASCADE,
+    FOREIGN KEY (goal_id) REFERENCES goal(id) ON DELETE CASCADE
+);
