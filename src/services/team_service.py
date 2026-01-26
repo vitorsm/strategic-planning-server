@@ -24,8 +24,11 @@ class TeamService(GenericEntityService[Team]):
         return self.__team_repository
 
     def pre_persist_custom(self, team: Team, is_create: bool):
+        if not team.members:
+            team.members = []
+
         try:
-            [self.__user_service.find_by_id(user_id) for user_id in team.members_ids]
+            team.members = [self.__user_service.find_by_id(user.id) for user in team.members]
         except EntityNotFoundException:
             raise InvalidEntityException(self._get_entity_type_name(), ["members"])
 

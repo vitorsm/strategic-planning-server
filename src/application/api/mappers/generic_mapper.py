@@ -1,7 +1,7 @@
 from dataclasses import fields, Field, is_dataclass
 from datetime import datetime
 from enum import Enum, StrEnum
-from typing import Generic, TypeVar, Optional, Type, get_args, List, Any, get_origin, Union, Callable, Dict
+from typing import Generic, TypeVar, Optional, Type, get_args, List, Any, get_origin, Union, Callable, Dict, ForwardRef
 from uuid import UUID
 
 from src.application.api.mappers import uuid_mapper
@@ -112,6 +112,9 @@ class GenericMapper(Generic[Entity]):
 
     @classmethod
     def __convert_to_entity_attribute(cls, attribute_type: Type, original_value: Optional[Any]) -> Optional[Any]:
+        if isinstance(attribute_type, ForwardRef) and cls._get_entity_type().__name__ in str(attribute_type):
+            return cls.to_entity(original_value)
+
         if not original_value:
             return original_value
 
@@ -162,7 +165,11 @@ class GenericMapper(Generic[Entity]):
         if attribute_type is Enum or attribute_type is StrEnum:
             return True
 
-        parents = attribute_type.__bases__
+        try:
+            parents = attribute_type.__bases__
+        except AttributeError:
+            return False
+
         return GenericMapper.__is_enum_type(parents[0]) if parents else False
 
     @staticmethod

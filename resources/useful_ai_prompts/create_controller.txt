@@ -1,1 +1,1 @@
-read the file CONTRIBUTING.md to know how to code in this project. The entity ENTITY_NAME is already created. It has the service as well. Now implement the adapter, add the table creation to the file init_database.sql. Create the integration tests and add the test scenario to the file iniit_database_load.
+read the file CONTRIBUTING.md to know how to code in this project. The entity ENTITY_NAME is already created. It has the service and the repository as well. Now implement the controller and add the tests

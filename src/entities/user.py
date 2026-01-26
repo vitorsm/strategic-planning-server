@@ -26,6 +26,9 @@ class User:
         if not self.login:
             invalid_fields.append("login")
 
+        if not self.password:
+            invalid_fields.append("password")
+
         if invalid_fields:
             raise InvalidEntityException("User", invalid_fields)
 

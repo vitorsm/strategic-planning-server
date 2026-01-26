@@ -2,6 +2,7 @@ import datetime
 from uuid import uuid4
 
 from src.entities.exceptions.authentication_exception import AuthenticationException
+from src.entities.exceptions.entity_not_found_exception import EntityNotFoundException
 from src.entities.exceptions.invalid_entity_exception import InvalidEntityException
 from src.entities.exceptions.permission_exception import PermissionException
 from src.entities.user import User
@@ -51,5 +52,12 @@ class UserService(GenericService[User]):
 
         if not user or not encryption_utils.check_encrypted_password(password, user.password):
             raise AuthenticationException(login)
+
+        return user
+
+    def find_by_login(self, login: str) -> User:
+        user = self.__user_repository.find_by_login(login)
+        if not user:
+            raise EntityNotFoundException(self._get_entity_type_name(), login)
 
         return user

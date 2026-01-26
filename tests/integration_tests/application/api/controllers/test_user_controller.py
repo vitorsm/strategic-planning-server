@@ -86,3 +86,21 @@ class TestUserController(BaseAPITest, GenericControllerTest):
     def test_get_all_entities_without_token(self):
         # user controller doesn't have this function
         pass
+
+    def test_get_current_user(self):
+        # given
+        address = f"{self.get_address()}/me"
+        headers = self.get_default_headers()
+
+        # when
+        response = self.client.get(address, headers=headers)
+
+        # then
+        self.assertEqual(200, response.status_code, response.text)
+        response_data = response.json
+        self.assertEqual(str(user_mock.get_default_user().id), response_data["id"])
+        self.assertEqual("User 1", response_data["name"])
+        self.assertEqual("user1", response_data["login"])
+        self.assertIsNone(response_data["password"])
+        self.assertIsNotNone(response_data["updated_at"])
+        self.assertIsNone(response_data["deleted_at"])

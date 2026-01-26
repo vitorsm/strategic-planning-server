@@ -11,7 +11,8 @@ class WorkRecordUserDB(Base):
     work_record_id = Column(UUID, ForeignKey("work_record.id"), primary_key=True)
     user_id = Column(UUID, ForeignKey("user.id"), primary_key=True)
 
-    user_db = relationship("UserDB", foreign_keys=[user_id], lazy="joined")
+    user_db = relationship("UserDB")
+    work_record_db = relationship("WorkRecordDB", foreign_keys=[work_record_id])
 
     def __init__(self, work_record_id: UUID, user_id: UUID):
         self.work_record_id = work_record_id
@@ -36,11 +37,11 @@ class WorkRecordDB(GenericEntityDB, Base[WorkRecord]):
     goal_db = relationship("GoalDB", foreign_keys=[goal_id], lazy="joined")
     team_db = relationship("TeamDB", foreign_keys=[team_id], lazy="joined")
 
-    users = relationship("WorkRecordUserDB", lazy="joined",
-                         foreign_keys="WorkRecordDB.id", remote_side="WorkRecordUserDB.work_record_id",
-                         primaryjoin="WorkRecordDB.id == WorkRecordUserDB.work_record_id",
-                         uselist=True, cascade="all, delete-orphan",
-                         single_parent=True)
+    users = relationship(
+        "WorkRecordUserDB",
+        back_populates="work_record_db",
+        cascade="all, delete-orphan"
+    )
 
     def __init__(self, work_record: WorkRecord):
         super().__init__(work_record)

@@ -21,7 +21,11 @@ class TestSQLGoalRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest):
         self.assertEqual(goal1.description, goal2.description)
         self.assertEqual(goal1.type, goal2.type)
         self.assertEqual(goal1.due_date, goal2.due_date)
-        self.assertEqual(goal1.parent_goal_id, goal2.parent_goal_id)
+        if goal1.parent_goal:
+            self.assertIsNotNone(goal2.parent_goal)
+            self.assertEqual(goal1.parent_goal.id, goal2.parent_goal.id)
+        else:
+            self.assertIsNone(goal2.parent_goal)
 
     def get_repository(self) -> GenericEntityRepository:
         return self.repository
@@ -35,7 +39,7 @@ class TestSQLGoalRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest):
         goal2.user = None
         goal2.status = GoalStatus.DONE
         goal2.type = GoalType.PERSONAL
-        goal2.parent_goal_id = FIRST_DEFAULT_ID
+        goal2.parent_goal = self.get_default_entity()
         goal2.description = None
 
         return [goal1, goal2]

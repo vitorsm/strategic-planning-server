@@ -21,6 +21,8 @@ class TestSQLTaskTypeRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest)
 
         entity2.id = SECOND_DEFAULT_ID
         entity2.name = "Type 2"
+        entity2.color = "#00FF00"
+        entity2.icon = "check"
         entity2.parent_type = entity1
 
         return [entity1, entity2]
@@ -47,3 +49,5 @@ class TestSQLTaskTypeRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest)
 
     def compare_entities_custom(self, type1: TaskType, type2: TaskType):
         self.assertEqual(type1.parent_type, type2.parent_type)
+        self.assertEqual(type1.color, type2.color)
+        self.assertEqual(type1.icon, type2.icon)

@@ -15,7 +15,8 @@ class TestSQLTeamRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest):
         self.repository = SQLTeamRepository(self.db_instance)
 
     def compare_entities_custom(self, team1: Team, team2: Team) -> bool:
-        self.assertEqual(team1.members_ids, team2.members_ids)
+        self.assertEqual(team1.members, team2.members)
+        self.assertEqual(team1.description, team2.description)
 
     def get_repository(self) -> GenericEntityRepository:
         return self.repository
@@ -26,7 +27,8 @@ class TestSQLTeamRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest):
 
         team2.id = SECOND_DEFAULT_ID
         team2.name = "Team 2"
-        team2.members_ids = []
+        team2.members = []
+        team2.description = None
 
         return [team1, team2]
 
@@ -42,4 +44,5 @@ class TestSQLTeamRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest):
         team = self.get_default_entity()
         team.name = "new name"
         team.members_ids = [SECOND_DEFAULT_ID]
+        team.description = "New description"
         return team

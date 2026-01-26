@@ -1,0 +1,1785 @@
+openapi: 3.0.3
+info:
+  title: Strategic Planning Server API
+  version: "1.0.0"
+  description: |
+    OpenAPI specification for the Strategic Planning Server (Flask).
+    Most resources follow a shared CRUD pattern plus (for GenericEntity resources) `find_all` by `workspace_id`.
+
+servers:
+  - url: http://localhost:5000
+
+tags:
+  - name: Auth
+  - name: Users
+  - name: Workspaces
+  - name: Task Types
+  - name: Teams
+  - name: Feedbacks
+  - name: Goals
+  - name: Meetings
+  - name: Reminders
+  - name: Strategic Plans
+  - name: Work Records
+
+paths:
+  /api/authenticate:
+    post:
+      tags: [Auth]
+      summary: Authenticate and get a JWT access token
+      operationId: authenticate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthenticateRequest"
+      responses:
+        "200":
+          description: JWT access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticateResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/users:
+    post:
+      tags: [Users]
+      summary: Create a user (no auth required)
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/users/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Users]
+      summary: Get a user by id
+      operationId: getUserById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Users]
+      summary: Update a user
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Users]
+      summary: Delete a user (soft delete)
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/workspaces:
+    post:
+      tags: [Workspaces]
+      summary: Create a workspace
+      operationId: createWorkspace
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/workspaces/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Workspaces]
+      summary: Get a workspace by id
+      operationId: getWorkspaceById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Workspaces]
+      summary: Update a workspace
+      operationId: updateWorkspace
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Workspaces]
+      summary: Delete a workspace (soft delete)
+      operationId: deleteWorkspace
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/task-types:
+    get:
+      tags: [Task Types]
+      summary: List task types by workspace
+      operationId: listTaskTypes
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TaskType"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Task Types]
+      summary: Create a task type
+      operationId: createTaskType
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskTypeCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskType"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/task-types/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Task Types]
+      summary: Get a task type by id
+      operationId: getTaskTypeById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskType"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Task Types]
+      summary: Update a task type
+      operationId: updateTaskType
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskTypeUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskType"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Task Types]
+      summary: Delete a task type (soft delete)
+      operationId: deleteTaskType
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/teams:
+    get:
+      tags: [Teams]
+      summary: List teams by workspace
+      operationId: listTeams
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Teams]
+      summary: Create a team
+      operationId: createTeam
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/teams/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Teams]
+      summary: Get a team by id
+      operationId: getTeamById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Teams]
+      summary: Update a team
+      operationId: updateTeam
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Teams]
+      summary: Delete a team (soft delete)
+      operationId: deleteTeam
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/feedbacks:
+    get:
+      tags: [Feedbacks]
+      summary: List feedbacks by workspace
+      operationId: listFeedbacks
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Feedback"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Feedbacks]
+      summary: Create a feedback
+      operationId: createFeedback
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feedback"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/feedbacks/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Feedbacks]
+      summary: Get a feedback by id
+      operationId: getFeedbackById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feedback"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Feedbacks]
+      summary: Update a feedback
+      operationId: updateFeedback
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feedback"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Feedbacks]
+      summary: Delete a feedback (soft delete)
+      operationId: deleteFeedback
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/goals:
+    get:
+      tags: [Goals]
+      summary: List goals by workspace
+      operationId: listGoals
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Goal"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Goals]
+      summary: Create a goal
+      operationId: createGoal
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoalCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Goal"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/goals/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Goals]
+      summary: Get a goal by id
+      operationId: getGoalById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Goal"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Goals]
+      summary: Update a goal
+      operationId: updateGoal
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoalUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Goal"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Goals]
+      summary: Delete a goal (soft delete)
+      operationId: deleteGoal
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/meetings:
+    get:
+      tags: [Meetings]
+      summary: List meetings by workspace
+      operationId: listMeetings
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Meeting"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Meetings]
+      summary: Create a meeting
+      operationId: createMeeting
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MeetingCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/meetings/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Meetings]
+      summary: Get a meeting by id
+      operationId: getMeetingById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Meetings]
+      summary: Update a meeting
+      operationId: updateMeeting
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MeetingUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Meetings]
+      summary: Delete a meeting (soft delete)
+      operationId: deleteMeeting
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/reminders:
+    get:
+      tags: [Reminders]
+      summary: List reminders by workspace
+      operationId: listReminders
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reminder"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Reminders]
+      summary: Create a reminder
+      operationId: createReminder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReminderCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reminder"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/reminders/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Reminders]
+      summary: Get a reminder by id
+      operationId: getReminderById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reminder"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Reminders]
+      summary: Update a reminder
+      operationId: updateReminder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReminderUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reminder"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Reminders]
+      summary: Delete a reminder (soft delete)
+      operationId: deleteReminder
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/strategic-plans:
+    get:
+      tags: [Strategic Plans]
+      summary: List strategic plans by workspace
+      operationId: listStrategicPlans
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StrategicPlan"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Strategic Plans]
+      summary: Create a strategic plan
+      operationId: createStrategicPlan
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StrategicPlanCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StrategicPlan"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/strategic-plans/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Strategic Plans]
+      summary: Get a strategic plan by id
+      operationId: getStrategicPlanById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StrategicPlan"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Strategic Plans]
+      summary: Update a strategic plan
+      operationId: updateStrategicPlan
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StrategicPlanUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StrategicPlan"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Strategic Plans]
+      summary: Delete a strategic plan (soft delete)
+      operationId: deleteStrategicPlan
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/work-records:
+    get:
+      tags: [Work Records]
+      summary: List work records by workspace
+      operationId: listWorkRecords
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Work Records]
+      summary: Create a work record
+      operationId: createWorkRecord
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkRecordCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/work-records/{entity_id}:
+    parameters:
+      - $ref: "#/components/parameters/EntityId"
+    get:
+      tags: [Work Records]
+      summary: Get a work record by id
+      operationId: getWorkRecordById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkRecord"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Work Records]
+      summary: Update a work record
+      operationId: updateWorkRecord
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkRecordUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Work Records]
+      summary: Delete a work record (soft delete)
+      operationId: deleteWorkRecord
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    EntityId:
+      name: entity_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    WorkspaceId:
+      name: workspace_id
+      in: query
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/APIError"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/APIError"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/APIError"
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/APIError"
+
+  schemas:
+    APIError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ERR1002
+        title:
+          type: string
+        details:
+          type: string
+          nullable: true
+      required: [code, title, details]
+
+    AuthenticateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required: [username, password]
+
+    AuthenticateResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+      required: [access_token]
+
+    # ---- Shared primitives / references ----
+    UUID:
+      type: string
+      format: uuid
+
+    DateTime:
+      type: string
+      format: date-time
+      description: ISO 8601 string (UTC)
+
+    UserRef:
+      type: object
+      description: Minimal user reference (typically only `id` is needed in write payloads).
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+      required: [id]
+
+    WorkspaceRef:
+      type: object
+      description: Minimal workspace reference (typically only `id` is needed in write payloads).
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+      required: [id]
+
+    TeamRef:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+      required: [id]
+
+    GoalRef:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+      required: [id]
+
+    TaskTypeRef:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+      required: [id]
+
+    GenericEntity:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        workspace:
+          $ref: "#/components/schemas/Workspace"
+        created_by:
+          $ref: "#/components/schemas/User"
+        updated_by:
+          $ref: "#/components/schemas/User"
+        created_at:
+          $ref: "#/components/schemas/DateTime"
+        updated_at:
+          $ref: "#/components/schemas/DateTime"
+        deleted_at:
+          $ref: "#/components/schemas/DateTime"
+          nullable: true
+      required: [id, name, workspace]
+
+    GenericEntityWriteBase:
+      type: object
+      description: |
+        Base schema for write payloads of GenericEntity resources.
+        The server fills audit fields; clients typically provide `name`, `workspace.id`, and entity-specific fields.
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        workspace:
+          $ref: "#/components/schemas/WorkspaceRef"
+      required: [name, workspace]
+
+    # ---- User ----
+    User:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+          nullable: true
+          description: Always null in API responses.
+        updated_at:
+          $ref: "#/components/schemas/DateTime"
+          nullable: true
+        deleted_at:
+          $ref: "#/components/schemas/DateTime"
+          nullable: true
+      required: [id, name, login, password]
+
+    UserCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+      required: [name, login, password]
+
+    UserUpdate:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+          nullable: true
+      required: [id, name, login]
+
+    # ---- Workspace ----
+    Workspace:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        users_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/UUID"
+        created_by:
+          $ref: "#/components/schemas/User"
+        updated_by:
+          $ref: "#/components/schemas/User"
+        created_at:
+          $ref: "#/components/schemas/DateTime"
+        updated_at:
+          $ref: "#/components/schemas/DateTime"
+        deleted_at:
+          $ref: "#/components/schemas/DateTime"
+          nullable: true
+      required: [id, name, users_ids]
+
+    WorkspaceCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        users_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/UUID"
+      required: [name, users_ids]
+
+    WorkspaceUpdate:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        users_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/UUID"
+      required: [id, name, users_ids]
+
+    # ---- TaskType ----
+    TaskType:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntity"
+        - type: object
+          properties:
+            parent_type:
+              $ref: "#/components/schemas/TaskType"
+              nullable: true
+
+    TaskTypeCreate:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntityWriteBase"
+        - type: object
+          properties:
+            parent_type:
+              $ref: "#/components/schemas/TaskTypeRef"
+              nullable: true
+
+    TaskTypeUpdate:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntityWriteBase"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/UUID"
+            parent_type:
+              $ref: "#/components/schemas/TaskTypeRef"
+              nullable: true
+          required: [id]
+
+    # ---- Team ----
+    Team:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntity"
+        - type: object
+          properties:
+            members_ids:
+              type: array
+              items:
+                $ref: "#/components/schemas/UUID"
+
+    TeamCreate:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntityWriteBase"
+        - type: object
+          properties:
+            members_ids:
+              type: array
+              items:
+                $ref: "#/components/schemas/UUID"
+          required: [members_ids]
+
+    TeamUpdate:
+      allOf:
+        - $ref: "#/components/schemas/TeamCreate"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/UUID"
+          required: [id]
+
+    # ---- Feedback ----
+    FeedbackType:
+      type: string
+      enum: [POSITIVE, CONSTRUCTIVE]
+
+    Feedback:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntity"
+        - type: object
+          properties:
+            description:
+              type: string
+              nullable: true
+            type:
+              $ref: "#/components/schemas/FeedbackType"
+            user_from:
+              $ref: "#/components/schemas/User"
+            user_to:
+              $ref: "#/components/schemas/User"
+            delivered:
+              type: boolean
+          required: [type, user_from, user_to]
+
+    FeedbackCreate:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntityWriteBase"
+        - type: object
+          properties:
+            description:
+              type: string
+              nullable: true
+            type:
+              $ref: "#/components/schemas/FeedbackType"
+            user_from:
+              $ref: "#/components/schemas/UserRef"
+            user_to:
+              $ref: "#/components/schemas/UserRef"
+            delivered:
+              type: boolean
+          required: [type, user_from, user_to]
+
+    FeedbackUpdate:
+      allOf:
+        - $ref: "#/components/schemas/FeedbackCreate"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/UUID"
+          required: [id]
+
+    # ---- Goal ----
+    GoalType:
+      type: string
+      enum: [PERSONAL, ORGANIZATIONAL]
+
+    GoalStatus:
+      type: string
+      enum: [NOT_STARTED, IN_PROGRESS, DONE, ARCHIVED]
+
+    Goal:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntity"
+        - type: object
+          properties:
+            status:
+              $ref: "#/components/schemas/GoalStatus"
+            description:
+              type: string
+              nullable: true
+            type:
+              $ref: "#/components/schemas/GoalType"
+            due_date:
+              $ref: "#/components/schemas/DateTime"
+            user:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            team:
+              $ref: "#/components/schemas/Team"
+              nullable: true
+            parent_goal_id:
+              $ref: "#/components/schemas/UUID"
+              nullable: true
+          required: [status, type, due_date]
+
+    GoalCreate:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntityWriteBase"
+        - type: object
+          properties:
+            status:
+              $ref: "#/components/schemas/GoalStatus"
+            description:
+              type: string
+              nullable: true
+            type:
+              $ref: "#/components/schemas/GoalType"
+            due_date:
+              $ref: "#/components/schemas/DateTime"
+            user:
+              $ref: "#/components/schemas/UserRef"
+              nullable: true
+            team:
+              $ref: "#/components/schemas/TeamRef"
+              nullable: true
+            parent_goal_id:
+              $ref: "#/components/schemas/UUID"
+              nullable: true
+          required: [status, type, due_date]
+
+    GoalUpdate:
+      allOf:
+        - $ref: "#/components/schemas/GoalCreate"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/UUID"
+          required: [id]
+
+    # ---- Meeting ----
+    Meeting:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntity"
+        - type: object
+          properties:
+            users:
+              type: array
+              items:
+                $ref: "#/components/schemas/User"
+            notes:
+              type: array
+              items:
+                type: string
+            meeting_date:
+              $ref: "#/components/schemas/DateTime"
+          required: [users, meeting_date]
+
+    MeetingCreate:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntityWriteBase"
+        - type: object
+          properties:
+            users:
+              type: array
+              items:
+                $ref: "#/components/schemas/UserRef"
+            notes:
+              type: array
+              items:
+                type: string
+            meeting_date:
+              $ref: "#/components/schemas/DateTime"
+          required: [users, meeting_date]
+
+    MeetingUpdate:
+      allOf:
+        - $ref: "#/components/schemas/MeetingCreate"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/UUID"
+          required: [id]
+
+    # ---- Reminder ----
+    Reminder:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntity"
+        - type: object
+          properties:
+            to_user:
+              $ref: "#/components/schemas/User"
+            description:
+              type: string
+              nullable: true
+          required: [to_user]
+
+    ReminderCreate:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntityWriteBase"
+        - type: object
+          properties:
+            to_user:
+              $ref: "#/components/schemas/UserRef"
+            description:
+              type: string
+              nullable: true
+          required: [to_user]
+
+    ReminderUpdate:
+      allOf:
+        - $ref: "#/components/schemas/ReminderCreate"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/UUID"
+          required: [id]
+
+    # ---- StrategicPlan ----
+    TaskTypePlan:
+      type: object
+      properties:
+        task_type:
+          $ref: "#/components/schemas/TaskType"
+        percentage:
+          type: number
+          format: float
+      required: [task_type, percentage]
+
+    TaskTypePlanWrite:
+      type: object
+      properties:
+        task_type:
+          $ref: "#/components/schemas/TaskTypeRef"
+        percentage:
+          type: number
+          format: float
+      required: [task_type, percentage]
+
+    StrategicPlan:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntity"
+        - type: object
+          properties:
+            task_type_plans:
+              type: array
+              items:
+                $ref: "#/components/schemas/TaskTypePlan"
+            goals:
+              type: array
+              items:
+                $ref: "#/components/schemas/Goal"
+            start_date:
+              $ref: "#/components/schemas/DateTime"
+            end_date:
+              $ref: "#/components/schemas/DateTime"
+          required: [start_date, end_date]
+
+    StrategicPlanCreate:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntityWriteBase"
+        - type: object
+          properties:
+            task_type_plans:
+              type: array
+              items:
+                $ref: "#/components/schemas/TaskTypePlanWrite"
+            goals:
+              type: array
+              items:
+                $ref: "#/components/schemas/GoalRef"
+            start_date:
+              $ref: "#/components/schemas/DateTime"
+            end_date:
+              $ref: "#/components/schemas/DateTime"
+          required: [start_date, end_date]
+
+    StrategicPlanUpdate:
+      allOf:
+        - $ref: "#/components/schemas/StrategicPlanCreate"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/UUID"
+          required: [id]
+
+    # ---- WorkRecord ----
+    WorkRecord:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntity"
+        - type: object
+          properties:
+            task_type:
+              $ref: "#/components/schemas/TaskType"
+            users:
+              type: array
+              items:
+                $ref: "#/components/schemas/User"
+            goal:
+              $ref: "#/components/schemas/Goal"
+              nullable: true
+            team:
+              $ref: "#/components/schemas/Team"
+              nullable: true
+            description:
+              type: string
+              nullable: true
+          required: [task_type]
+
+    WorkRecordCreate:
+      allOf:
+        - $ref: "#/components/schemas/GenericEntityWriteBase"
+        - type: object
+          properties:
+            task_type:
+              $ref: "#/components/schemas/TaskTypeRef"
+            users:
+              type: array
+              items:
+                $ref: "#/components/schemas/UserRef"
+            goal:
+              $ref: "#/components/schemas/GoalRef"
+              nullable: true
+            team:
+              $ref: "#/components/schemas/TeamRef"
+              nullable: true
+            description:
+              type: string
+              nullable: true
+          required: [task_type]
+
+    WorkRecordUpdate:
+      allOf:
+        - $ref: "#/components/schemas/WorkRecordCreate"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/UUID"
+          required: [id]
+
+

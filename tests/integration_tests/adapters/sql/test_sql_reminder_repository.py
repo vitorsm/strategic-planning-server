@@ -2,10 +2,10 @@ import unittest
 from typing import Any, List
 
 from src.adapters.sql.sql_reminder_repository import SQLReminderRepository
-from src.entities.reminder import Reminder
+from src.entities.reminder import Reminder, ReminderStatus
 from tests.integration_tests.adapters.base_sql_alchemy_test import BaseSQLAlchemyTest
 from tests.integration_tests.adapters.sql.generic_entity_repository_test import GenericEntityRepositoryTest
-from tests.mocks import reminder_mock, SECOND_DEFAULT_ID, user_mock, workspace_mock
+from tests.mocks import reminder_mock, SECOND_DEFAULT_ID, user_mock, team_mock, workspace_mock
 
 
 class TestSQLReminderRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest):
@@ -16,6 +16,9 @@ class TestSQLReminderRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest)
 
     def compare_entities_custom(self, reminder1: Reminder, reminder2: Reminder):
         self.assertEqual(reminder1.to_user, reminder2.to_user)
+        self.assertEqual(reminder1.status, reminder2.status)
+        self.assertEqual(reminder1.related_user, reminder2.related_user)
+        self.assertEqual(reminder1.related_team, reminder2.related_team)
         self.assertEqual(reminder1.description, reminder2.description)
 
     def get_repository(self) -> SQLReminderRepository:
@@ -27,7 +30,10 @@ class TestSQLReminderRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest)
 
         reminder2.id = SECOND_DEFAULT_ID
         reminder2.name = "Reminder 2"
+        reminder2.status = ReminderStatus.DONE
         reminder2.description = None
+        reminder2.related_user = None
+        reminder2.related_team = None
 
         return [reminder1, reminder2]
 
@@ -47,6 +53,9 @@ class TestSQLReminderRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTest)
     def get_updated_entity(self) -> Any:
         reminder = reminder_mock.get_default_reminder()
         reminder.name = "new name"
+        reminder.status = ReminderStatus.DONE
         reminder.description = "new description"
+        reminder.related_user = user_mock.get_default_user()
+        reminder.related_team = None
         return reminder
 

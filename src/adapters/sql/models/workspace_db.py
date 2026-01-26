@@ -12,6 +12,9 @@ class WorkspaceUsersDB(Base):
     workspace_id = Column(UUID, ForeignKey("workspace.id", ondelete="CASCADE"), primary_key=True)
     user_id = Column(UUID, ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
 
+    workspace = relationship("WorkspaceDB", back_populates="users")
+    user = relationship("UserDB")
+
     def __init__(self, workspace_id: UUID, user_id: UUID):
         self.workspace_id = workspace_id
         self.user_id = user_id
@@ -40,9 +43,11 @@ class WorkspaceDB(Base[Workspace]):
     updated_by_db = relationship("UserDB", lazy="select",
                                  primaryjoin="WorkspaceDB.updated_by == UserDB.id")
 
-    users = relationship("WorkspaceUsersDB", lazy="select", cascade="all, delete-orphan",
-                         primaryjoin="WorkspaceDB.id == WorkspaceUsersDB.workspace_id",
-                         passive_deletes=True)
+    users = relationship(
+        "WorkspaceUsersDB",
+        back_populates="workspace",
+        cascade="all, delete-orphan"
+    )
 
     def __init__(self, workspace: Workspace):
         self.update_attributes(workspace)

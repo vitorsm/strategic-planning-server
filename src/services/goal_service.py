@@ -1,3 +1,6 @@
+from typing import List
+from uuid import UUID
+
 from src.entities.exceptions.entity_not_found_exception import EntityNotFoundException
 from src.entities.exceptions.invalid_entity_exception import InvalidEntityException
 from src.entities.goal import Goal
@@ -39,14 +42,22 @@ class GoalService(GenericEntityService[Goal]):
             except EntityNotFoundException:
                 invalid_fields.append("team")
 
-        if goal.parent_goal_id:
+        if goal.parent_goal:
             try:
-                goal.parent_goal = self.find_by_id(goal.parent_goal_id)
+                goal.parent_goal = self.find_by_id(goal.parent_goal.id)
             except EntityNotFoundException:
-                invalid_fields.append("parent_goal_id")
+                invalid_fields.append("parent_goal")
 
         if invalid_fields:
             raise InvalidEntityException(self._get_entity_type_name(), invalid_fields)
 
     def get_authentication_repository(self) -> AuthenticationRepository:
         return self.__authentication_repository
+
+    def find_by_team(self, team_id: UUID) -> List[Goal]:
+        team = self.__team_service.find_by_id(team_id)
+        return self.__goal_repository.find_by_team_id(team.id)
+
+    def find_by_user(self, user_id: UUID) -> List[Goal]:
+        user = self.__user_service.find_by_id(user_id)
+        return self.__goal_repository.find_by_user_id(user.id)

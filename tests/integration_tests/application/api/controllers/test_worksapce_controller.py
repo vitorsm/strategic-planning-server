@@ -10,7 +10,9 @@ from tests.mocks import workspace_mock, FIRST_DEFAULT_ID, SECOND_DEFAULT_ID
 class TestWorkspaceController(BaseAPITest, GenericControllerTest):
 
     def get_valid_entity(self) -> dict:
-        return WorkspaceMapper.to_dto(workspace_mock.get_valid_workspace())
+        workspace = workspace_mock.get_valid_workspace()
+        workspace.users_ids = [FIRST_DEFAULT_ID]
+        return WorkspaceMapper.to_dto(workspace)
 
     def get_default_entity(self) -> dict:
         return WorkspaceMapper.to_dto(workspace_mock.get_default_workspace())
@@ -52,3 +54,27 @@ class TestWorkspaceController(BaseAPITest, GenericControllerTest):
 
     def test_get_all_entities_without_token(self):
         pass
+
+    def test_create_entity_without_user_id(self):
+        # given
+        address = self.get_address()
+        entity = self.get_valid_entity()
+        headers = self.get_default_headers()
+
+        # when
+        response = self.client.post(address, json=entity, headers=headers)
+
+        # then
+        response_data = response.json
+        expected_entity = entity
+        expected_entity["users_ids"] = [str(FIRST_DEFAULT_ID)]
+
+        self.assertEqual(201, response.status_code, address + " - " + response.text)
+        self.compare_entities(entity, response_data)
+        self.assertIsNotNone(response_data["id"])
+
+        address = self.get_address(response_data['id'])
+        response = self.client.get(address, headers=headers)
+        persisted_entity = response.json
+        self.assertEqual(200, response.status_code)
+        self.compare_entities(entity, persisted_entity)

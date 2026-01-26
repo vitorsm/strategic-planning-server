@@ -11,23 +11,28 @@ from src.entities.exceptions.invalid_entity_exception import InvalidEntityExcept
 class GenericEntityController(GenericController[EntityService, EntityMapper], metaclass=abc.ABCMeta):
 
     def create_endpoints(self):
-        @self.get_controller().route("", methods=["GET"])
-        @jwt_required()
-        def find_all():
-            workspace_id = uuid_mapper.to_uuid(request.args.get("workspace_id"))
+        if self.put_find_all():
+            @self.get_controller().route("", methods=["GET"])
+            @jwt_required()
+            def find_all():
+                workspace_id = uuid_mapper.to_uuid(request.args.get("workspace_id"))
 
-            if not workspace_id:
-                raise InvalidEntityException("UUID", ["workspace_id"])
+                if not workspace_id:
+                    raise InvalidEntityException("UUID", ["workspace_id"])
 
-            entity_service = self._get_entity_service()
-            entities = entity_service.find_all(workspace_id)
+                entity_service = self._get_entity_service()
+                entities = entity_service.find_all(workspace_id)
 
-            mapper = self._get_mapper_type()
+                mapper = self._get_mapper_type()
 
-            return jsonify(mapper.to_dto(entities))
+                return jsonify(mapper.to_dto(entities))
 
         self.create_custom_endpoints()
 
     @abc.abstractmethod
     def create_custom_endpoints(self):
         raise NotImplementedError
+
+    def put_find_all(self) -> bool:
+        return True
+

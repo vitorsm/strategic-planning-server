@@ -18,9 +18,13 @@ class TestSQLWorkRecordRepository(BaseSQLAlchemyTest, GenericEntityRepositoryTes
     def compare_entities_custom(self, work_record1: WorkRecord, work_record2: WorkRecord) -> bool:
         self.assertEqual(work_record1.description, work_record2.description)
         self.assertEqual(work_record1.task_type, work_record2.task_type)
-        self.assertEqual(work_record1.goal, work_record2.goal)
         self.assertEqual(work_record1.team, work_record2.team)
         self.assertEqual(work_record1.users, work_record2.users)
+        if work_record1.goal:
+            self.assertIsNotNone(work_record2.goal)
+            self.assertEqual(work_record1.goal.id, work_record2.goal.id)
+        else:
+            self.assertIsNone(work_record2.goal)
 
     def get_repository(self) -> GenericEntityRepository:
         return self.repository

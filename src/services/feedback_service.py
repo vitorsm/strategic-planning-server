@@ -1,3 +1,6 @@
+from typing import List
+from uuid import UUID
+
 from src.entities.exceptions.entity_not_found_exception import EntityNotFoundException
 from src.entities.exceptions.invalid_entity_exception import InvalidEntityException
 from src.entities.feedback import Feedback
@@ -38,7 +41,9 @@ class FeedbackService(GenericEntityService[Feedback]):
         if invalid_fields:
             raise InvalidEntityException(self._get_entity_type_name(), invalid_fields)
 
-
-
     def get_authentication_repository(self) -> AuthenticationRepository:
         return self.__authentication_repository
+
+    def find_by_user(self, user_id: UUID) -> List[Feedback]:
+        user = self.__user_service.find_by_id(user_id)
+        return self.__feedback_repository.find_by_user_id(user.id)

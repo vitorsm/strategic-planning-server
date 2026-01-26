@@ -18,6 +18,8 @@ class TestTaskTypeController(BaseAPITest, GenericEntityControllerTests):
 
         dto2["id"] = str(SECOND_DEFAULT_ID)
         dto2["name"] = "Type 2"
+        dto2["color"] = "#00FF00"
+        dto2["icon"] = "check"
         dto2["parent_type"] = dto1
 
         return [dto1, dto2]
@@ -48,6 +50,8 @@ class TestTaskTypeController(BaseAPITest, GenericEntityControllerTests):
 
     def compare_generic_entities(self, entity1: dict, entity2: dict, compare_id: bool = False):
         self.assertEqual(entity1["name"], entity2["name"])
+        self.assertEqual(entity1["color"], entity2["color"])
+        self.assertEqual(entity1["icon"], entity2["icon"])
 
         if entity1.get("parent_type"):
             self.assertEqual(entity1["parent_type"].get("id"), entity2["parent_type"].get("id"))

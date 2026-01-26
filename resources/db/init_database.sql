@@ -36,6 +36,8 @@ CREATE TABLE workspace_has_user (
 CREATE TABLE task_type (
     id UUID NOT NULL,
     name TEXT NOT NULL,
+    color TEXT NOT NULL,
+    icon TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP NULL DEFAULT NULL,
@@ -60,6 +62,7 @@ CREATE TABLE team (
     created_by UUID NOT NULL,
     updated_by UUID NOT NULL,
     workspace_id UUID NOT NULL,
+    description TEXT NULL,
 
     PRIMARY KEY (id),
     FOREIGN KEY (created_by) REFERENCES "user"(id),
@@ -175,13 +178,18 @@ CREATE TABLE reminder (
     workspace_id UUID NOT NULL,
 
     description TEXT NULL,
+    status VARCHAR(100) NOT NULL,
     to_user_id UUID NOT NULL,
+    related_user_id UUID NULL,
+    related_team_id UUID NULL,
 
     PRIMARY KEY (id),
     FOREIGN KEY (created_by) REFERENCES "user"(id),
     FOREIGN KEY (updated_by) REFERENCES "user"(id),
     FOREIGN KEY (workspace_id) REFERENCES workspace(id),
-    FOREIGN KEY (to_user_id) REFERENCES "user"(id)
+    FOREIGN KEY (to_user_id) REFERENCES "user"(id),
+    FOREIGN KEY (related_user_id) REFERENCES "user"(id),
+    FOREIGN KEY (related_team_id) REFERENCES team(id)
 );
 
 CREATE TABLE strategic_plan (

@@ -21,7 +21,7 @@ class TestGoalController(BaseAPITest, GenericEntityControllerTests):
         dto2["description"] = None
         dto2["type"] = GoalType.PERSONAL.name
         dto2["user"] = None
-        dto2["parent_goal_id"] = str(FIRST_DEFAULT_ID)
+        dto2["parent_goal"] = dto1
 
         return [dto1, dto2]
 
@@ -30,7 +30,11 @@ class TestGoalController(BaseAPITest, GenericEntityControllerTests):
         self.assertEqual(goal1["description"], goal2["description"])
         self.assertEqual(goal1["type"], goal2["type"])
         self.assertEqual(goal1["due_date"], goal2["due_date"])
-        self.assertEqual(goal1["parent_goal_id"], goal2["parent_goal_id"])
+        if goal1["parent_goal"]:
+            self.assertIsNotNone(goal2["parent_goal"])
+            self.assertEqual(goal1["parent_goal"]["id"], goal2["parent_goal"]["id"])
+        else:
+            self.assertIsNone(goal2["parent_goal"])
 
         if goal1.get("user"):
             self.assertEqual(goal1["user"]["id"], goal2["user"]["id"])

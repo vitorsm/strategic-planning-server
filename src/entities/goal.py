@@ -29,7 +29,8 @@ class Goal(GenericEntity):
     due_date: datetime
     user: Optional[User]
     team: Optional[Team]
-    parent_goal_id: Optional[UUID]
+    parent_goal: Optional['Goal']
+    children: List['Goal']
 
     def _get_invalid_fields(self) -> List[str]:
         invalid_fields = []

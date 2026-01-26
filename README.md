@@ -56,3 +56,6 @@ coverage html
 
 ## Deploy
 Use the script resources/scripts/generate-version.sh to publish the docker image in docker hub.
+
+## todo
+1. add tests to the tree endpoints
